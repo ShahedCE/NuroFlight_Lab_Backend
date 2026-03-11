@@ -32,7 +32,7 @@ import { ContactsModule } from './modules/contacts/contacts.module';
         database:configService.get("DB_NAME")  ,
         
         autoLoadEntities:true,
-        synchronize:true, //in development phase: true, in production false
+        synchronize:false, //in development phase: true, in production false
         logging:true,
 
         extra: {

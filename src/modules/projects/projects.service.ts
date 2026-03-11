@@ -1,7 +1,7 @@
 import { ConflictException, Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Project } from "src/database/entities/project.entity";
-import { Like, Repository } from "typeorm";
+import { Repository } from "typeorm";
 import { CreateProjectDto } from "./dto/create-project.dto";
 import { UpdateProjectDto } from "./dto/update-project.dto";
 
@@ -24,10 +24,10 @@ export class ProjectService{
       },
     });
   }
-
+  //By slug
   async getProjectBySlug(slug:string):Promise<Project>{
     const project= await this.projectRepo.findOne({
-      where: {slug:Like(`%${slug}%`)}
+      where: {slug}
     })
 
     if(!project){
@@ -35,7 +35,8 @@ export class ProjectService{
     }
   return project;
   }
-  //=======
+  
+  //======= Admin ==========
   //CRUD
   //Create Project
   async createProject(projectData: CreateProjectDto): Promise<Project> {
