@@ -2,10 +2,17 @@ import { Module } from '@nestjs/common';
 import { ProjectsModule } from './modules/projects/projects.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { PublicationsModule } from './modules/publications/publications.module';
+import { TeamModule } from './modules/team/team.module';
+import { JobPostsModule } from './modules/job-posts/job-posts.module';
+import { JobApplicationModule } from './modules/job-application/job-application.module';
+import { AuthModule } from './modules/auth/auth.module';
+import { ContactsModule } from './modules/contacts/contacts.module';
 
 
 @Module({
-  imports: [ ProjectsModule,
+  imports: [ AuthModule,ProjectsModule,PublicationsModule,TeamModule,
+          JobPostsModule,JobApplicationModule,ContactsModule,
 
      // .env file globally available now
     ConfigModule.forRoot({
@@ -25,7 +32,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
         database:configService.get("DB_NAME")  ,
         
         autoLoadEntities:true,
-        synchronize:false, //in development phase: true, in production false
+        synchronize:true, //in development phase: true, in production false
         logging:true,
 
         extra: {
