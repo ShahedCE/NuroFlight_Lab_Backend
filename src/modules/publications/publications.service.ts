@@ -1,4 +1,4 @@
-import { ConflictException, Injectable, NotFoundException } from "@nestjs/common";
+import { ConflictException, Get, Injectable, NotFoundException, Param } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Publication } from "src/database/entities/publication.entity";
 import { Repository } from "typeorm";
@@ -12,7 +12,33 @@ export class PublicationsService{
     private readonly publicRepo: Repository<Publication>
   ){}
 
+//Public Route Services
 
+async getAllPublications(): Promise<Publication[]> {
+
+  const publications= await this.publicRepo.find({
+    order:{
+      createdAt:'DESC'
+    }
+  });
+
+  return publications;
+}
+
+//get by slug
+
+async getPublicationBySlug( slug:string): Promise<Publication> {
+
+  const publication= await this.publicRepo.findOne({
+   where:{slug}
+  });
+
+  if(!publication){
+    throw new NotFoundException('Publication not found');
+  }
+
+  return publication;
+}
 
 
   //Admin Service
@@ -41,17 +67,17 @@ export class PublicationsService{
   }
 
   //Update
-  async updatePublication(id:string,updateData: UpdatePublicationDto):Promise<Publication> {
+  async updatePublication( id:string, updateData: UpdatePublicationDto):Promise<Publication> {
         const publication = await this.findOneById(id);
     
         // duplicate slug check
         if (updateData.slug && updateData.slug !== publication.slug) {
-          const existingProject = await this.publicRepo.findOne({
+          const existingPublication = await this.publicRepo.findOne({
             where: { slug: updateData.slug },
           });
     
-          if (existingProject) {
-            throw new ConflictException('A project with this slug already exists');
+          if (existingPublication) {
+            throw new ConflictException('A publication with this slug already exists');
           }
         }
     
@@ -62,12 +88,21 @@ export class PublicationsService{
       }
 
 
-
-
-
-
-
+//delete Publication
+    async deletePublication(id:string): Promise<{message:string}> {
       
+      const publication= await this.findOneById(id);
+
+      await this.publicRepo.remove(publication);
+      return {
+        message:"Publication deleted successfully"
+      }
+  }
+
+
+
+
+
   }
 
 

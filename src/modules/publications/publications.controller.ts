@@ -1,4 +1,4 @@
-import { Body, Controller, Param, Patch, Post } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, Patch, Post } from "@nestjs/common";
 import { PublicationsService } from "./publications.service";
 import { CreatePublicationDto } from "./dto/create-puiblication.dto";
 import { UpdatePublicationDto } from "./dto/update-publication.dto";
@@ -8,6 +8,30 @@ import { UpdatePublicationDto } from "./dto/update-publication.dto";
 export class PublicationsController {
    constructor(private readonly publicationService: PublicationsService){}
 
+ // =========================
+  // Public Routes
+  // =========================
+   @Get('publications')
+   async getAllPubliucations(){
+      const publications= await this.publicationService.getAllPublications();
+
+      return {
+         success:true,
+         message: 'Publication fetched successfully',
+         data:publications,
+      }
+   }
+
+   //Get by slug
+   @Get('publications/:slug')
+   async getPublicationBySlug(@Param('slug') slug:string){
+      const publication= await this.publicationService.getPublicationBySlug(slug);
+        return {
+         success:true,
+         message: 'Publication fetched successfully',
+         data:publication,
+      }
+   }
 
   // =========================
   // Admin Routes
@@ -34,6 +58,18 @@ export class PublicationsController {
     message: 'Publication updated successfully',
     data:updateData,
     }
+   }
+
+   @Delete('admin/publications/:id')
+   async deletePublication(@Param('slug') slug:string){
+
+      const result= await this.publicationService.deletePublication(slug);
+  return {
+    success:true,
+    message: result.message,
+    data:null,
+    }
+
    }
 
 

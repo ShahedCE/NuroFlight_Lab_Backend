@@ -1,0 +1,66 @@
+import {
+  ArrayUnique, IsArray,IsEmail,IsEnum,IsInt,IsOptional,
+   IsString,IsUrl,Length, Min,
+} from 'class-validator';
+import { TeamGroup } from '../../../common/enums/team-group.enum';
+import { TeamTag } from '../../../common/enums/team-tag.enum';
+
+export class CreateTeamMemberDto {
+  @IsString()
+  @Length(3, 220)
+  slug: string;
+
+  @IsString()
+  @Length(2, 150)
+  name: string;
+
+  @IsString()
+  @Length(2, 200)
+  title: string;
+
+  @IsOptional()
+  @IsString()
+  @Length(2, 255)
+  primaryAffiliation?: string;
+
+  @IsArray()
+  @ArrayUnique()
+  @IsString({ each: true })
+  bioLines: string[];
+
+  @IsOptional()
+  @IsArray()
+  @ArrayUnique()
+  @IsString({ each: true })
+  expertise?: string[];
+
+  @IsOptional()
+  @IsArray()
+  @ArrayUnique()
+  @IsEnum(TeamTag, { each: true }) // array এর প্রতিটা value TeamTag enum হতে হবে
+  tags?: TeamTag[];
+
+  @IsEnum(TeamGroup)
+  group: TeamGroup;
+
+  @IsOptional()
+  @IsInt()
+  @Min(1)
+  priority?: number;
+
+  @IsOptional()
+  @IsEmail()
+  email?: string;
+
+  @IsOptional()
+  @IsUrl()
+  linkedin?: string;
+
+  @IsOptional()
+  @IsUrl()
+  github?: string;
+
+  @IsOptional()
+  @IsUrl()
+  scholar?: string;
+}
