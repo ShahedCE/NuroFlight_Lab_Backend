@@ -5,7 +5,7 @@ import { Repository } from "typeorm";
 import { CreateTeamMemberDto } from "./dto/create-team-member.dto";
 import { TeamGroup } from "src/common/enums/team-group.enum";
 import { TeamTag } from "src/common/enums/team-tag.enum";
-import { UpdateTeamMemberDto } from "./dto/update-team-member.dto";
+import { UpdateTeamMemberDto } from "./dto/update-team.dto";
 
 @Injectable()
 export class TeamService{
@@ -80,13 +80,14 @@ export class TeamService{
   // Update team member
   async update(
     id: string,
-    updateTeamMemberDto: UpdateTeamMemberDto,
+    updateTeamMemberDto?: UpdateTeamMemberDto,
     imageUrl?: string, // image optional
   ): Promise<TeamMember> {
 
     const teamMember = await this.findOneById(id);
 
-    // if slug changed , duplicate check
+    // if updated data available then if slug changed , duplicate check
+    if(updateTeamMemberDto){ 
     if ( (updateTeamMemberDto.slug) && (updateTeamMemberDto.slug !== teamMember.slug) ) {
       const existingMember = await this.teamRepo.findOne({
         where: { slug: updateTeamMemberDto.slug },
@@ -95,6 +96,7 @@ export class TeamService{
         throw new ConflictException('A team member with this slug already exists');
        }     
     }
+  }
 
     //dto merge
     Object.assign(teamMember, updateTeamMemberDto)

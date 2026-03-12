@@ -4,6 +4,7 @@ import {
 } from 'class-validator';
 import { TeamGroup } from '../../../common/enums/team-group.enum';
 import { TeamTag } from '../../../common/enums/team-tag.enum';
+import { Transform } from 'class-transformer';
 
 export class CreateTeamMemberDto {
   @IsString()
@@ -23,17 +24,42 @@ export class CreateTeamMemberDto {
   @Length(2, 255)
   primaryAffiliation?: string;
 
+  @Transform(({value})=>{
+    //if string comes from form-data, then convering to string[](array)
+    if(typeof value === 'string'){
+      return JSON.parse(value);
+    }
+    return value;
+  })
   @IsArray()
   @ArrayUnique()
   @IsString({ each: true })
   bioLines: string[];
 
+  @Transform(({value})=>{
+    if(typeof value === 'string'){
+      return JSON.parse(value);
+    }
+  })
+
+  @Transform(({value})=>{
+    //if string comes from form-data, then convering to string[](array)
+    if(typeof value === 'string'){
+      return JSON.parse(value);
+    }
+  })
   @IsOptional()
   @IsArray()
   @ArrayUnique()
   @IsString({ each: true })
   expertise?: string[];
 
+  @Transform(({value})=>{
+    //if string comes from form-data, then convering to string[](array)
+    if(typeof value === 'string'){
+      return JSON.parse(value);
+    }
+  })
   @IsOptional()
   @IsArray()
   @ArrayUnique()

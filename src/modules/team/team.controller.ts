@@ -1,15 +1,49 @@
-import { Body, Controller, Post, UploadedFile, UseInterceptors } from "@nestjs/common";
+import { Body, Controller, Get, Param, Patch, Post, Query, UploadedFile, UseInterceptors } from "@nestjs/common";
 import { FileInterceptor } from "@nestjs/platform-express/multer";
 import { imageFileFilter, multerStorage } from "../uploads/multer.config";
 import { CreateTeamMemberDto } from "./dto/create-team-member.dto";
 import { TeamService } from "./team.service";
+import { TeamTag } from "src/common/enums/team-tag.enum";
+import { TeamGroup } from "src/common/enums/team-group.enum";
+import { UpdateTeamMemberDto } from "./dto/update-team.dto";
 
 @Controller()
 export class TeamController{
 
     constructor(private readonly teamService:TeamService){}
 
+  // =========================
+  // Public Routes
+  // =========================
+
+  @Get('team')
+  async findAll(
+    @Query('group') group?: TeamGroup,
+    @Query('tag') tag?: TeamTag,
+  ) {
+    const teamMembers = await this.teamService.findAll(group, tag);
+
+    return {
+      success: true,
+      message: 'Team members fetched successfully',
+      data: teamMembers,
+    };
+  }
+//By slug
+@Get('team/:slug')
+async findBySlug(@Param('slug') slug:string){
+    const member= await this.teamService.findOneBySlug(slug);
+
+    return {
+           success: true,
+      message: 'Team member fetched successfully',
+      data: member,
+    }
+
+}
+
     //Admin Route
+    //Create Team Member
     @Post('admin/team')
 @UseInterceptors(
   FileInterceptor('image', {
@@ -36,5 +70,36 @@ async create(
     data: teamMember,
   };
 }
+
+@Patch('admin/team/:id')
+  @UseInterceptors(
+    FileInterceptor('image', { //image in the multer form , image: xxx.jpg
+      storage: multerStorage('team'),
+      fileFilter: imageFileFilter,
+      limits: {
+        fileSize: 2 * 1024 * 1024, // 2MB
+      },
+    }),
+  )
+  async update(
+    @Param('id') id: string,
+    @UploadedFile() file?: Express.Multer.File,
+    @Body() updateTeamMemberDto?: UpdateTeamMemberDto,
+  ) {
+    // image optional in update route
+    const imagePath = file ? `/uploads/team/${file.filename}` : undefined;
+
+    const teamMember = await this.teamService.update(
+      id,
+      updateTeamMemberDto,
+      imagePath,
+    );
+
+    return {
+      success: true,
+      message: 'Team member updated successfully',
+      data: teamMember,
+    };
+  }
     
 }

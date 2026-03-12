@@ -10,7 +10,7 @@ export const multerStorage = (folder: string) =>
   diskStorage({
     destination: `./uploads/${folder}`, // uploads/team OR uploads/cv
 
-    filename: (req, file, callback) => {
+    filename: (req, file, callback) => {0
       /**
        * Unique filename generate
        * Example:
