@@ -8,9 +8,9 @@ import { extname } from "path";
  */
 export const multerStorage = (folder: string) =>
   diskStorage({
-    destination: `./uploads/${folder}`, // uploads/team OR uploads/cv
+    destination: `./src/modules/uploads/${folder}`, // uploads/team OR uploads/cv
 
-    filename: (req, file, callback) => {0
+    filename: (req, file, callback) => {
       /**
        * Unique filename generate
        * Example:

@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Patch, Post, Query, UploadedFile, UseInterceptors } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, Patch, Post, Query, UploadedFile, UseInterceptors } from "@nestjs/common";
 import { FileInterceptor } from "@nestjs/platform-express/multer";
 import { imageFileFilter, multerStorage } from "../uploads/multer.config";
 import { CreateTeamMemberDto } from "./dto/create-team-member.dto";
@@ -100,6 +100,17 @@ async create(
       message: 'Team member updated successfully',
       data: teamMember,
     };
+  }
+
+  @Delete('admin/team/:id')
+  async remove(@Param('id') id:string ){
+    const result= await this.teamService.remove(id);
+    return{
+      success:true,
+      message: result.message,
+      data: null,
+    }
+
   }
     
 }

@@ -36,31 +36,26 @@ export class CreateTeamMemberDto {
   @IsString({ each: true })
   bioLines: string[];
 
-  @Transform(({value})=>{
-    if(typeof value === 'string'){
-      return JSON.parse(value);
-    }
-  })
 
+  @IsOptional()
   @Transform(({value})=>{
     //if string comes from form-data, then convering to string[](array)
     if(typeof value === 'string'){
       return JSON.parse(value);
     }
   })
-  @IsOptional()
   @IsArray()
   @ArrayUnique()
   @IsString({ each: true })
   expertise?: string[];
 
+  @IsOptional()
   @Transform(({value})=>{
     //if string comes from form-data, then convering to string[](array)
     if(typeof value === 'string'){
       return JSON.parse(value);
     }
   })
-  @IsOptional()
   @IsArray()
   @ArrayUnique()
   @IsEnum(TeamTag, { each: true }) // array এর প্রতিটা value TeamTag enum হতে হবে
@@ -70,6 +65,10 @@ export class CreateTeamMemberDto {
   group: TeamGroup;
 
   @IsOptional()
+  @Transform(({ value }) => {
+  if (value === '' || value === undefined || value === null) return undefined;
+  return Number(value);
+})
   @IsInt()
   @Min(1)
   priority?: number;
@@ -79,14 +78,17 @@ export class CreateTeamMemberDto {
   email?: string;
 
   @IsOptional()
+  @Transform(({ value }) => typeof value === 'string' ? value.trim() : value)
   @IsUrl()
   linkedin?: string;
 
   @IsOptional()
+  @Transform(({ value }) => typeof value === 'string' ? value.trim() : value)
   @IsUrl()
   github?: string;
 
   @IsOptional()
+  @Transform(({ value }) => typeof value === 'string' ? value.trim() : value)
   @IsUrl()
   scholar?: string;
 }
