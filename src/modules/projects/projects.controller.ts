@@ -1,7 +1,8 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, UseGuards } from '@nestjs/common';
 import { ProjectService } from './projects.service';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
 @Controller()
 export class ProjectsController {
@@ -38,6 +39,7 @@ async getProjectBySlug(@Param('slug')slug: string){
   // Admin Routes
   // =========================
   //Create
+@UseGuards(JwtAuthGuard)
 @Post('admin/projects')
 async createProject(@Body() projectData:CreateProjectDto){
 

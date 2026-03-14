@@ -17,14 +17,13 @@ export class JobApplicationService{
         private readonly jobPostRepo: Repository<JobPost>
     ){}
 
-
      // Public: apply to a job
   async apply(
     jobId: string,
     createJobApplicationDto: CreateJobApplicationDto,
     cvFileUrl: string,
   ): Promise<JobApplication> {
-    // আগে check করবো job post exists কিনা
+    //  check if job post exists or not
     const jobPost = await this.jobPostRepo.findOne({
       where: { id: jobId },
     });
@@ -33,13 +32,13 @@ export class JobApplicationService{
       throw new NotFoundException('Job post not found');
     }
 
-    // শুধু published job এ apply করা যাবে
+    //can apply only on published job
     if (jobPost.status !== JobStatus.PUBLISHED) {
       throw new BadRequestException('This job is not open for applications');
     }
 
-    // চাইলে duplicate application prevent করতে পারো
-    // একই email একই job এ বারবার apply করলে block করবে
+    // preventing duplicate application 
+    // block application for same applicant(email) and job
     const existingApplication = await this.jobApplicationRepo.findOne({
       where: {
         jobId,
@@ -60,12 +59,15 @@ export class JobApplicationService{
     });
 
     return await this.jobApplicationRepo.save(jobApplication);
+
+    //Sending Mail................Now
+
   }
 
     // Admin: get all applications
   async findAll(): Promise<JobApplication[]> {
     return await this.jobApplicationRepo.find({
-      relations: ['job'], // related job post info include করবে
+      relations: ['job'], // include related job post info 
       order: {
         createdAt: 'DESC',
       },
@@ -89,7 +91,7 @@ export class JobApplicationService{
 
    // Admin: get all applications for a specific job
   async findByJobId(jobId: string): Promise<JobApplication[]> {
-    // job exists কিনা check করা ভালো
+    // check if job exists or not
     const jobPost = await this.jobPostRepo.findOne({
       where: { id: jobId },
     });
