@@ -5,6 +5,8 @@ import { JobPost } from "src/database/entities/job-post.entity";
 import { Repository } from "typeorm";
 import { CreateJobApplicationDto } from "./dto/create-job-application.dto";
 import { JobStatus } from "src/common/enums/job-status.enum";
+import { EventEmitter2 } from "@nestjs/event-emitter";
+import { EVENT_NAMES } from "src/common/events/event-names";
 
 @Injectable()
 export class JobApplicationService{
@@ -14,7 +16,9 @@ export class JobApplicationService{
         private readonly jobApplicationRepo: Repository<JobApplication>,
 
         @InjectRepository(JobPost)
-        private readonly jobPostRepo: Repository<JobPost>
+        private readonly jobPostRepo: Repository<JobPost>,
+        
+        private readonly eventEmitter:EventEmitter2
     ){}
 
      // Public: apply to a job
@@ -58,10 +62,31 @@ export class JobApplicationService{
       cvFileUrl,
     });
 
-    return await this.jobApplicationRepo.save(jobApplication);
+    await this.jobApplicationRepo.save(jobApplication);
 
     //Sending Mail................Now
-
+    // Trigger the job application created event (handled by job-application.listener)
+    this.eventEmitter.emit(EVENT_NAMES.JOB_APPLICATION_CREATED, {
+      applicationId: jobApplication.id,
+    
+      applicant: {
+        fullName: jobApplication.fullName,
+        email: jobApplication.email,
+      },
+    
+      job: {
+        id: jobPost.id,
+        title: jobPost.title,
+        team: jobPost.team,
+        level: jobPost.level,
+        type: jobPost.type,
+        location: jobPost.location,
+      },
+    
+      cvFileUrl,
+    });
+    
+    return jobApplication;
   }
 
     // Admin: get all applications
