@@ -35,20 +35,24 @@ export class AuthService{
     }
 
 //Login and Generate JWT Token
-async login(loginData: LoginDto){
-
-    const admin= await this.validateAdmin(loginData);
-    //payload
-    const payload={
-        sub: admin.id,
-        email:admin.email,
-    }
-
-    const token = await this.jwtService.signAsync(payload);//generates token by payload
-    return{
-        accessToken: token,
+async login(loginData: LoginDto) {
+    const admin = await this.validateAdmin(loginData);
+  
+    const payload = {
+      sub: admin.id,
+      email: admin.email,
     };
-}
+  
+    const token = await this.jwtService.signAsync(payload);
+  
+    return {
+      accessToken: token,
+      admin: {
+        id: admin.id,
+        email: admin.email,
+      },
+    };
+  }
 
 
 

@@ -10,14 +10,22 @@ async function bootstrap() {
        whitelist: true, // automatically remove field ouside DTO
       forbidNonWhitelisted: true, // will give error to extra unexpected field 
       transform: true, // help to payload transform 
-  }));  
+  })); 
+  
+  
+  app.enableCors({
+    origin: ["http://localhost:3000"],
+    credentials: true,
+  });
 
+  // Serve static assets from the "uploads" directory, accessible via the
+  // "/uploads/" URL prefix
   app.useStaticAssets(join(process.cwd(), 'uploads'), {
     prefix: '/uploads/',
   });
 
    
-  await app.listen(process.env.PORT ?? 3000);
-  console.log("Server Running On: http://localhost:3000")
+  await app.listen(process.env.PORT ?? 4000);
+  console.log("Server Running On: http://localhost:4000")
 }
 bootstrap();
